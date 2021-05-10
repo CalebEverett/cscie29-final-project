@@ -41,9 +41,6 @@ jobs:
     - name: Report coverage to codeclimate
       run: |
         ./cc-test-reporter after-build --exit-code 0
-    - name: Run final_project
-      run: |
-        pipenv run python -m final_project
     - name: Submit to Canvas
       if: false # Set this to true to submit
       run: |
