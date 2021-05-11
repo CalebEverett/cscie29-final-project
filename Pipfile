@@ -11,13 +11,16 @@ pytest = "*"
 pytest-cov = "*"
 pynacl = "*"
 gitpython = "*"
+jupyter = "*"
+ipykernel = "*"
+pytest-django = "*"
 
 [packages]
 django = "*"
 pygraphviz = "*"
 django-extensions = "*"
 canvasapi = "*"
-csci-utils = {editable = true, git = "https://${ACCESS_TOKEN}:x-oauth-basic@github.com/csci-e-29/2021sp-csci-utils-CalebEverett@master"}
+csci-utils = {editable = true, extras = ["all"], git = "https://${ACCESS_TOKEN}:x-oauth-basic@github.com/csci-e-29/2021sp-csci-utils-CalebEverett@master"}
 sphinx = "*"
 pydata-sphinx-theme = "*"
 sphinxcontrib-django2 = "*"

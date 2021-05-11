@@ -1,10 +1,13 @@
-from email.mime import application
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
 
 class TimeStampMixin(models.Model):
+    """Abstract base class to include `created_date` and `last_modified`
+    fields on all models.
+    """
+
     created_date = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(auto_now=True)
 
@@ -13,7 +16,13 @@ class TimeStampMixin(models.Model):
 
 
 class Company(TimeStampMixin):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(
+        max_length=200,
+        unique=True,
+        help_text="Name of the company in 200 characters or less.",
+    )
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
 
 
 class Application(TimeStampMixin):
@@ -28,6 +37,10 @@ class Application(TimeStampMixin):
             CREATED: Created in the system, but not otherwise touched.
             PRE_REJECTED: Rejected before being sent out to reviewers for
                 further evaluation.
+            REVIEWS_IN_PROGRESS: Approved for review.
+            REVIEWS_COMPLETED: Specified number of review have been completed.
+            POST_REJECTED: Rejected based on review scores.
+            APPROVED: Approved to move through to final evaluation phase.
         """
 
         CREATED = 100
