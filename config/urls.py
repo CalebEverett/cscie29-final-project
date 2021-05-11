@@ -15,6 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.schemas import get_schema_view
+from django.views.generic import TemplateView
 
 
-urlpatterns = [path("grants/", include("grants.urls")), path("admin/", admin.site.urls)]
+urlpatterns = [
+    path("grants/", include("grants.urls")),
+    path("admin/", admin.site.urls),
+    path(
+        "openapi/",
+        get_schema_view(
+            title="Grants Admin API", description="Grants Admin API", version="0.1.1"
+        ),
+        name="openapi-schema",
+    ),
+    path(
+        "swagger-ui/",
+        TemplateView.as_view(
+            template_name="swagger-ui.html",
+            extra_context={"schema_url": "openapi-schema"},
+        ),
+        name="swagger-ui",
+    ),
+]
