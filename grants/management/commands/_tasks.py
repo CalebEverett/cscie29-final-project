@@ -91,7 +91,7 @@ class CompanyFixtureTask(BaseLoadTask):
 
         with self.output().open("w") as f:
             for k, row in df.iterrows():
-                record = {"pk": k, "model": "grants.Company", "fields": dict(row)}
+                record = {"pk": k + 1, "model": "grants.Company", "fields": dict(row)}
                 f.write(json.dumps(record) + "\n")
 
 
@@ -105,3 +105,40 @@ class CompanyTableTask(BaseLoadTask):
 
     def output(self):
         return DjangoModelTarget(model=Company, count=self.sample_size)
+
+
+class ApplicationFixtureTask(BaseLoadTask):
+    """Creates fixture for Application."""
+
+    company_table = Requirement(CompanyTableTask)
+    filename = Parameter(default="application.jsonl")
+
+    def output(self):
+        return LocalTarget(f"{self.parent_dir}/{self.filename}")
+
+    def run(self):
+        with self.output().open("w") as f:
+            for c in self.input()["company_table"].model.objects.all():
+                app_record = dict(
+                    pk=c.id,
+                    model="grants.Application",
+                    fields=dict(
+                        company=c.id,
+                        created_date=c.created_date.isoformat(),
+                        last_modified=c.last_modified.isoformat(),
+                        status=100,
+                    ),
+                )
+                f.write(json.dumps(app_record) + "\n")
+
+
+class ApplicationTableTask(BaseLoadTask):
+    """Loads data to application table."""
+
+    fixture = Requirement(ApplicationFixtureTask)
+
+    def run(self):
+        call_command(loaddata.Command(), self.input()["fixture"].path)
+
+    def output(self):
+        return DjangoModelTarget(model=Application, count=self.sample_size)
