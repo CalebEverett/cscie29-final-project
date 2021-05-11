@@ -16,9 +16,10 @@ from luigi import (
 import requests
 
 from csci_utils.luigi import ForceableTask
+
 from csci_utils.luigi.task import Requirement, Requires
 
-from grants.models import Company, Application, ApplicationQuestion
+from grants.models import Company, Application, Reviewer
 
 
 class DjangoModelTarget(Target):
@@ -133,7 +134,7 @@ class ApplicationFixtureTask(BaseLoadTask):
 
 
 class ApplicationTableTask(BaseLoadTask):
-    """Loads data to application table."""
+    """Loads data to Application table."""
 
     fixture = Requirement(ApplicationFixtureTask)
 
@@ -142,3 +143,45 @@ class ApplicationTableTask(BaseLoadTask):
 
     def output(self):
         return DjangoModelTarget(model=Application, count=self.sample_size)
+
+
+class ReviewerFixtureTask(BaseLoadTask):
+    """Creates fixture for Reviewer."""
+
+    filename = Parameter(default="reviewer.jsonl")
+
+    def output(self):
+        return LocalTarget(f"{self.parent_dir}/{self.filename}")
+
+    def run(self):
+        base_url = "https://random-data-api.com/api/"
+        end_point = "users/random_user"
+
+        r = requests.get(f"{base_url}{end_point}", params=dict(size=self.sample_size))
+
+        df = pd.DataFrame(r.json())[["email", "last_name", "first_name"]]
+
+        df["last_modified"] = datetime.datetime.now().isoformat()
+        df["created_date"] = datetime.datetime.now().isoformat()
+        df["status"] = 100
+
+        with self.output().open("w") as f:
+            for k, row in df.iterrows():
+                record = {
+                    "pk": k + 1,
+                    "model": "grants.Reviewer",
+                    "fields": dict(row),
+                }
+                f.write(json.dumps(record) + "\n")
+
+
+class ReviewerTableTask(BaseLoadTask):
+    """Loads data to Reviewer table."""
+
+    fixture = Requirement(ReviewerFixtureTask)
+
+    def run(self):
+        call_command(loaddata.Command(), self.input()["fixture"].path)
+
+    def output(self):
+        return DjangoModelTarget(model=Reviewer, count=self.sample_size)

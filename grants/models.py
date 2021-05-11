@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 
 
 class TimeStampMixin(models.Model):
@@ -28,7 +27,7 @@ class Company(TimeStampMixin):
 class Application(TimeStampMixin):
     """Main object for grant applications."""
 
-    class ApplicationStatus(models.IntegerChoices):
+    class Status(models.IntegerChoices):
         """Choices for application status. These are set up as integers
         to facilitate the use of the status as hierarchical, i.e.,
         `APPROVED` > `CREATED`.
@@ -50,35 +49,35 @@ class Application(TimeStampMixin):
         POST_REJECTED = 500
         APPROVED = 600
 
-    company = models.ForeignKey("Company", on_delete=models.PROTECT)
-    status = models.IntegerField(choices=ApplicationStatus.choices)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    status = models.IntegerField(choices=Status.choices)
 
 
-class Reviewer(models.Model):
-    class ReviewerStatus(models.IntegerChoices):
+class Reviewer(TimeStampMixin):
+    class Status(models.IntegerChoices):
         NEW = 100
         ACTIVE = 200
         PAUSED = 300
         INACTIVE = 400
 
-    email = models.EmailField(primary_key=True)
-    status = models.IntegerField(choices=ReviewerStatus.choices)
-    first_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    status = models.IntegerField(choices=Status.choices)
     last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50)
 
 
 class Question(TimeStampMixin):
-    class QuestionType(models.TextChoices):
+    class Type(models.TextChoices):
         TEXT = "TEXT"
         NUMBER = "NUMBER"
 
-    class QuestionStatus(models.TextChoices):
+    class Status(models.TextChoices):
         DRAFT = "DRAFT"
         ACTIVE = "ACTIVE"
         INACTIVE = "INACTIVE"
 
-    question_type = models.CharField(choices=QuestionType.choices, max_length=25)
-    status = models.CharField(choices=QuestionStatus.choices, max_length=25)
+    question_type = models.CharField(choices=Type.choices, max_length=25)
+    status = models.CharField(choices=Status.choices, max_length=25)
     question = models.CharField(max_length=250)
 
     class Meta:
@@ -93,8 +92,8 @@ class ApplicationQuestion(Question):
 
 
 class ApplicationAnswer(TimeStampMixin):
-    application = models.ForeignKey(Application, on_delete=models.PROTECT)
-    question = models.ForeignKey(ApplicationQuestion, on_delete=models.PROTECT)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    question = models.ForeignKey(ApplicationQuestion, on_delete=models.CASCADE)
     answer_text = models.CharField(max_length=1000)
     answer_number = models.IntegerField()
 
@@ -104,12 +103,12 @@ class ReviewQuestion(Question):
 
 
 class Assignment(TimeStampMixin):
-    application = models.ForeignKey(Application, on_delete=models.PROTECT)
-    reviewer = models.ForeignKey(Reviewer, on_delete=models.PROTECT)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(Reviewer, on_delete=models.CASCADE)
 
 
 class ReviewAnswer(TimeStampMixin):
-    assignment = models.ForeignKey(Assignment, on_delete=models.PROTECT)
-    question = models.ForeignKey(ReviewQuestion, on_delete=models.PROTECT)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    question = models.ForeignKey(ReviewQuestion, on_delete=models.CASCADE)
     answer_text = models.CharField(max_length=250)
     answer_score = models.IntegerField()
