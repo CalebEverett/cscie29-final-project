@@ -26,6 +26,8 @@ pydata-sphinx-theme = "*"
 sphinxcontrib-django2 = "*"
 sphinx-plotly-directive = "*"
 djangorestframework = "*"
+pyyaml = "*"
+uritemplate = "*"
 
 [requires]
 python_version = "3.8"
