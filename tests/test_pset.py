@@ -1,27 +1,43 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import datetime
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pandas as pd
 from django.core.management import call_command
-from django.forms.models import model_to_dict
 from django.test import TestCase as DJTest
-from luigi import build, execution_summary
+from luigi import build, execution_summary, Task
 
-from grants.models import Company
-from grants.management.commands._tasks import CompanyFixtureTask, CompanyTableTask
+from grants.models import Application, Company, Reviewer
+
+from grants.management.commands._tasks import (
+    ApplicationFixtureTask,
+    ApplicationTableTask,
+    CompanyFixtureTask,
+    CompanyTableTask,
+    ReviewerFixtureTask,
+    ReviewerTableTask,
+    AllTablesTask,
+)
 
 SUCCESS = execution_summary.LuigiStatusCode.SUCCESS
 
 
-class LoadCompanyTests(DJTest):
-    def test_company_fixture(self):
+class LoadTableTests(DJTest):
+    """Abstract base class to test creation of fixture and load to designated table."""
+
+    __test__ = False
+    fixture_task: Task
+    table_task: Task
+    sample_size: int = 10
+
+    def test_fixture(self):
         with TemporaryDirectory() as tmp:
-            create_fixture = CompanyFixtureTask(sample_size=10, parent_dir=tmp)
+            create_fixture = self.fixture_task(
+                sample_size=self.sample_size, parent_dir=tmp
+            )
 
             result = build(
                 [create_fixture],
@@ -44,9 +60,9 @@ class LoadCompanyTests(DJTest):
 
         self.assertFalse(Path(tmp).exists())
 
-    def test_company_table(self):
+    def test_table(self):
         with TemporaryDirectory() as tmp:
-            load_table = CompanyTableTask(parent_dir=tmp, sample_size=10)
+            load_table = self.table_task(parent_dir=tmp, sample_size=self.sample_size)
 
             result = build(
                 [load_table],
@@ -54,5 +70,72 @@ class LoadCompanyTests(DJTest):
                 local_scheduler=True,
             )
 
-        self.assertEqual(Company.objects.count(), load_table.sample_size)
+        self.assertEqual(
+            load_table.output().model.objects.count(), load_table.sample_size
+        )
         self.assertEqual(result.status, SUCCESS)
+
+
+class LoadCompanyTests(LoadTableTests):
+    __test__ = True
+    fixture_task = CompanyFixtureTask
+    table_task = CompanyTableTask
+
+
+class LoadApplicationTests(LoadTableTests):
+    __test__ = True
+    fixture_task = ApplicationFixtureTask
+    table_task = ApplicationTableTask
+
+
+class LoadApplicationTests(LoadTableTests):
+    __test__ = True
+    fixture_task = ApplicationFixtureTask
+    table_task = ApplicationTableTask
+
+
+class LoadReviewerTests(LoadTableTests):
+    __test__ = True
+    fixture_task = ReviewerFixtureTask
+    table_task = ReviewerTableTask
+
+
+class AllTableTests(DJTest):
+    """Ensure that all tables are loaded successfully."""
+
+    def test_all_tables(self):
+        with TemporaryDirectory() as tmp:
+            load_table = AllTablesTask(parent_dir=tmp, sample_size=10)
+
+            result = build(
+                [load_table],
+                detailed_summary=True,
+                local_scheduler=True,
+            )
+
+        self.assertEqual(result.status, SUCCESS)
+        print(load_table.input())
+        for table, target in load_table.input().items():
+            with self.subTest(table=table):
+                self.assertEqual(target.model.objects.count(), load_table.sample_size)
+
+    def test_load_sample_data(self):
+        """Ensure that management command to load sample data functions correctly."""
+
+        sample_size = 10
+
+        with TemporaryDirectory() as tmp:
+
+            call_command(
+                "load_sample_data",
+                "--parent_dir",
+                tmp,
+                "--sample_size",
+                sample_size,
+                "--force",
+                "yes",
+            )
+
+        for model in [Application, Company, Reviewer]:
+            with self.subTest(model=model.__name__):
+                self.assertEqual(model.objects.count(), sample_size)

@@ -16,7 +16,7 @@ import sys
 import django
 
 sys.path.insert(0, os.path.abspath("../"))
-os.environ["DJANGO_SETTINGS_MODULE"] = "grants_admin.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
 django.setup()
 
 # -- Project information -----------------------------------------------------
