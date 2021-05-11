@@ -91,7 +91,7 @@ class CompanyFixtureTask(BaseLoadTask):
 
         with self.output().open("w") as f:
             for k, row in df.iterrows():
-                record = {"model": "grants.Company", "fields": dict(row)}
+                record = {"pk": k, "model": "grants.Company", "fields": dict(row)}
                 f.write(json.dumps(record) + "\n")
 
 
