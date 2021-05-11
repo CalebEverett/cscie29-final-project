@@ -1,20 +1,30 @@
-from django.shortcuts import render
-
-from django.http import HttpResponse
-
-
-def index(request):
-    return HttpResponse("Hello, grants!")
+from .models import Application, Company, Reviewer
+from .serializers import ApplicationSerializer, CompanySerializer, ReviewerSerializer
+from rest_framework import viewsets
 
 
-def detail(request, application_id):
-    return HttpResponse("You're looking at question %s." % application_id)
+class ApplicationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows applications to be created, viewed, edited or deleted.
+    """
+
+    queryset = Application.objects.all().order_by("-created_date")
+    serializer_class = ApplicationSerializer
 
 
-def results(request, application_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % application_id)
+class CompanyViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows companies to be created, viewed, edited or deleted.
+    """
+
+    queryset = Company.objects.all().order_by("-created_date")
+    serializer_class = CompanySerializer
 
 
-def vote(request, applicationquestion_id):
-    return HttpResponse("You're voting on question %s." % applicationquestion_id)
+class ReviewerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows reviewers to be created, viewed, edited or deleted.
+    """
+
+    queryset = Reviewer.objects.all().order_by("-created_date")
+    serializer_class = ReviewerSerializer

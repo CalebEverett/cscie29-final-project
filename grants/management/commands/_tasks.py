@@ -6,8 +6,6 @@ from django.core.management import call_command
 from django.core.management.commands import loaddata
 from django.db.models import Model
 from luigi import (
-    BoolParameter,
-    DateParameter,
     IntParameter,
     LocalTarget,
     Parameter,
@@ -49,7 +47,6 @@ class BaseLoadTask(ForceableTask):
     """
 
     parent_dir = Parameter(default="grants/fixtures")
-    full = BoolParameter(default=False)
     sample_size = IntParameter(default=100)
     requires = Requires()
 
@@ -185,3 +182,15 @@ class ReviewerTableTask(BaseLoadTask):
 
     def output(self):
         return DjangoModelTarget(model=Reviewer, count=self.sample_size)
+
+
+class AllTablesTask(BaseLoadTask):
+    """
+    Somewhat of a wrapper task to load all tables. Uses reviewer for output
+    even though all the requirements have have their own output targets. Used
+    this instead of Wrapper to be able to pass down properties from BaseLoadTask.
+    """
+
+    companies = Requirement(CompanyTableTask)
+    applications = Requirement(ApplicationTableTask)
+    reviewers = Requirement(ReviewerTableTask)

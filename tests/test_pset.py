@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import datetime
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pandas as pd
+from django.core.management import call_command
 from django.test import TestCase as DJTest
 from luigi import build, execution_summary, Task
+
+from grants.models import Application, Company, Reviewer
 
 from grants.management.commands._tasks import (
     ApplicationFixtureTask,
@@ -17,6 +19,7 @@ from grants.management.commands._tasks import (
     CompanyTableTask,
     ReviewerFixtureTask,
     ReviewerTableTask,
+    AllTablesTask,
 )
 
 SUCCESS = execution_summary.LuigiStatusCode.SUCCESS
@@ -95,3 +98,44 @@ class LoadReviewerTests(LoadTableTests):
     __test__ = True
     fixture_task = ReviewerFixtureTask
     table_task = ReviewerTableTask
+
+
+class AllTableTests(DJTest):
+    """Ensure that all tables are loaded successfully."""
+
+    def test_all_tables(self):
+        with TemporaryDirectory() as tmp:
+            load_table = AllTablesTask(parent_dir=tmp, sample_size=10)
+
+            result = build(
+                [load_table],
+                detailed_summary=True,
+                local_scheduler=True,
+            )
+
+        self.assertEqual(result.status, SUCCESS)
+        print(load_table.input())
+        for table, target in load_table.input().items():
+            with self.subTest(table=table):
+                self.assertEqual(target.model.objects.count(), load_table.sample_size)
+
+    def test_load_sample_data(self):
+        """Ensure that management command to load sample data functions correctly."""
+
+        sample_size = 10
+
+        with TemporaryDirectory() as tmp:
+
+            call_command(
+                "load_sample_data",
+                "--parent_dir",
+                tmp,
+                "--sample_size",
+                sample_size,
+                "--force",
+                "yes",
+            )
+
+        for model in [Application, Company, Reviewer]:
+            with self.subTest(model=model.__name__):
+                self.assertEqual(model.objects.count(), sample_size)
