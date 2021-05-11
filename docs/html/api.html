@@ -218,7 +218,18 @@ The main class you need to care about is crawler.main.Crawler:</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="grants.models.Application.ApplicationStatus">
 <em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ApplicationStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grants/models.html#Application.ApplicationStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grants.models.Application.ApplicationStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Choices for application status. These are set up as integers
+to facilitate the use of the status as hierarchical, i.e.,
+<cite>APPROVED</cite> &gt; <cite>CREATED</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CREATED</strong> – Created in the system, but not otherwise touched.</p></li>
+<li><p><strong>PRE_REJECTED</strong> – Rejected before being sent out to reviewers for
+further evaluation.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">

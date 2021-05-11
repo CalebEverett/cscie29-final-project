@@ -186,6 +186,16 @@
     <span class="sd">&quot;&quot;&quot;Main object for grant applications.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Application.ApplicationStatus"><a class="viewcode-back" href="../../api.html#grants.models.Application.ApplicationStatus">[docs]</a>    <span class="k">class</span> <span class="nc">ApplicationStatus</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">IntegerChoices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Choices for application status. These are set up as integers</span>
+<span class="sd">        to facilitate the use of the status as hierarchical, i.e.,</span>
+<span class="sd">        `APPROVED` &gt; `CREATED`.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            CREATED: Created in the system, but not otherwise touched.</span>
+<span class="sd">            PRE_REJECTED: Rejected before being sent out to reviewers for</span>
+<span class="sd">                further evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">CREATED</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="n">PRE_REJECTED</span> <span class="o">=</span> <span class="mi">200</span>
         <span class="n">REVIEWS_IN_PROGRESS</span> <span class="o">=</span> <span class="mi">300</span>

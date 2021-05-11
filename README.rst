@@ -8,13 +8,15 @@ Final Project
     :target: https://github.com/csci-e-29/2021sp-final-project-CalebEverett/actions?query=workflow%3A%22build+status%22
     :alt: Build Status
 
-.. |maintain| image:: https://api.codeclimate.com/v1/badges/ec91b5c89c085f918cf2/maintainability
-   :target: https://codeclimate.com/repos/ec91b5c89c085f918cf2/maintainability
+.. |maintain| image:: https://api.codeclimate.com/v1/badges/f236a223fa8d6c15ae62/maintainability
+   :target: https://codeclimate.com/repos/6099c8a7054fec018c00a95e/maintainability
    :alt: Maintainability
 
-.. |coverage| image:: https://api.codeclimate.com/v1/badges/ec91b5c89c085f918cf2/test_coverage
-   :target: https://codeclimate.com/repos/ec91b5c89c085f918cf2/test_coverage
+
+.. |coverage| image:: https://api.codeclimate.com/v1/badges/f236a223fa8d6c15ae62/test_coverage
+   :target: https://codeclimate.com/repos/6099c8a7054fec018c00a95e/test_coverage
    :alt: Test Coverage
+
 
 .. contents:: Table of Contents
 

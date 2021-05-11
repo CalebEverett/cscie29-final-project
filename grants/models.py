@@ -20,6 +20,16 @@ class Application(TimeStampMixin):
     """Main object for grant applications."""
 
     class ApplicationStatus(models.IntegerChoices):
+        """Choices for application status. These are set up as integers
+        to facilitate the use of the status as hierarchical, i.e.,
+        `APPROVED` > `CREATED`.
+
+        Parameters:
+            CREATED: Created in the system, but not otherwise touched.
+            PRE_REJECTED: Rejected before being sent out to reviewers for
+                further evaluation.
+        """
+
         CREATED = 100
         PRE_REJECTED = 200
         REVIEWS_IN_PROGRESS = 300

@@ -19,7 +19,6 @@ sys.path.insert(0, os.path.abspath("../"))
 os.environ["DJANGO_SETTINGS_MODULE"] = "grants_admin.settings"
 django.setup()
 
-
 # -- Project information -----------------------------------------------------
 
 project = "Grants Admin"
@@ -38,6 +37,8 @@ release = "0.1.1"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.napoleon",
     "sphinx.ext.graphviz",
     "sphinxcontrib_django2",
     "sphinx_plotly_directive",
