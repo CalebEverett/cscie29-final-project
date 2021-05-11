@@ -28,7 +28,7 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt install graphviz
+        sudo apt-get install graphviz graphviz-dev
         python -m pip install --upgrade pipenv
         pipenv install --dev --ignore-pipfile --deploy
     - name: Install and setup code coverage tool
