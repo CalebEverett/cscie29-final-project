@@ -13,15 +13,15 @@ from django.test import TestCase as DJTest
 from luigi import build, execution_summary
 
 from grants.models import Company
-from grants.management.commands._tasks import CreateCompanyFixture
+from grants.management.commands._tasks import CompanyFixtureTask, CompanyTableTask
 
 SUCCESS = execution_summary.LuigiStatusCode.SUCCESS
 
 
-class LoadReviewsTests(DJTest):
+class LoadCompanyTests(DJTest):
     def test_company_fixture(self):
         with TemporaryDirectory() as tmp:
-            create_fixture = CreateCompanyFixture(sample_size=10, parent_dir=tmp)
+            create_fixture = CompanyFixtureTask(sample_size=10, parent_dir=tmp)
 
             result = build(
                 [create_fixture],
@@ -43,3 +43,16 @@ class LoadReviewsTests(DJTest):
             self.assertFalse(df.isna().any().any())
 
         self.assertFalse(Path(tmp).exists())
+
+    def test_company_table(self):
+        with TemporaryDirectory() as tmp:
+            load_table = CompanyTableTask(parent_dir=tmp, sample_size=10)
+
+            result = build(
+                [load_table],
+                detailed_summary=True,
+                local_scheduler=True,
+            )
+
+        self.assertEqual(Company.objects.count(), load_table.sample_size)
+        self.assertEqual(result.status, SUCCESS)

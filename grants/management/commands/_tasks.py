@@ -56,7 +56,7 @@ class BaseLoadTask(ForceableTask):
         NotImplementedError()
 
 
-class CreateCompanyFixture(BaseLoadTask):
+class CompanyFixtureTask(BaseLoadTask):
     """Creates fixture for Company."""
 
     filename = Parameter(default="company.jsonl")
@@ -84,9 +84,24 @@ class CreateCompanyFixture(BaseLoadTask):
         df = pd.concat(
             [df_company[["business_name"]], df_address[["city", "state"]]], axis=1
         )
+
         df.columns = ["name", "city", "state"]
+        df["last_modified"] = datetime.datetime.now().isoformat()
+        df["created_date"] = datetime.datetime.now().isoformat()
 
         with self.output().open("w") as f:
             for k, row in df.iterrows():
                 record = {"model": "grants.Company", "fields": dict(row)}
                 f.write(json.dumps(record) + "\n")
+
+
+class CompanyTableTask(BaseLoadTask):
+    """Loads data to company table."""
+
+    fixture = Requirement(CompanyFixtureTask)
+
+    def run(self):
+        call_command(loaddata.Command(), self.input()["fixture"].path)
+
+    def output(self):
+        return DjangoModelTarget(model=Company, count=self.sample_size)
