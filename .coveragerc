@@ -1,5 +1,5 @@
 [paths]
-source = final_project
+source = grants
 
 [run]
 branch = true
