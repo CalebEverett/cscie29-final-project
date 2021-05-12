@@ -69,6 +69,7 @@ docs/_build
 .bootstrap
 .appveyor.token
 *.bak
+_build
 
 # Mypy Cache
 .mypy_cache/
@@ -81,3 +82,4 @@ docs
 !docs/index.html
 db.sqlite3
 scratch.ipynb
+
