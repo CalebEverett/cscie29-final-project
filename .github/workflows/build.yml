@@ -43,7 +43,7 @@ jobs:
       run: |
         ./cc-test-reporter after-build --exit-code 0
     - name: Submit to Canvas
-      if: false # Set this to true to submit
+      if: True # Set this to true to submit
       run: |
         pipenv run python submit.py
     - name: Make docs

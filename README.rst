@@ -30,6 +30,11 @@ However, this can be administratively burdensome as most often corporate social 
 
 This project aims to solve this problem and make it possible for a small number of people to effectively engage employees to make high quality evaluations of grant applications. This project is phase one of the completed application and includes the data models and a REST API built with `django <https://www.djangoproject.com/>`_ and `django-rest-framework`_.
 
+Documentation
+=============
+`Link to documentation <https://csci-e-29.github.io/2021sp-final-project-CalebEverett/html/index.html>`_
+
+
 Highlights
 ==========
 
@@ -52,3 +57,5 @@ Below are a few Advanced Python for Data Science highlights:
   ==========
   ..  image:: grant_models.png
       :alt: Data models
+
+.. _django-rest-framework: https://www.django-rest-framework.org
